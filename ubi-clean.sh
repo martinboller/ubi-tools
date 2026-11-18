@@ -2,10 +2,10 @@
 
 check_status_install() {
     if [ "$?" == 0 ]; then
-        echo -e "\e[32m[+] $TOOL_INSTALL successfully installed/configured\e[0m" | tee -a $SCRIPT_DIR/nandsim.log;
+        echo -e "\e[32m[+] $TOOL_INSTALL successfully installed/configured\e[0m";
      else
-        echo -e "\e[31m[-] ERROR: $TOOL_INSTALL not installed/configured correctly\e[0m" | tee -a $SCRIPT_DIR/nandsim.log;
-        exit 1;
+        echo -e "\e[31m[-] ERROR: $TOOL_INSTALL not installed/configured correctly\e[0m";
+        #exit 1;
     fi
     sudo echo > /dev/null 2>&1;
 }
@@ -38,6 +38,10 @@ cleanup() {
     sudo modprobe -r mtdblock;
     check_status_install;
 
+    TOOL_INSTALL="remove mtd kernel module";
+    sudo modprobe -r mtd;
+    check_status_install;
+
     # Double checking that everything is removed
     MODPROBE_STATUS=$(lsmod | grep -E "ubi|mtd|nand")
     if [[ $MODPROBE_STATUS ]]; then
@@ -50,7 +54,8 @@ cleanup() {
 ##############################################################################################################################
 main() {
 
-cleanup;
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)";
+    cleanup;
 
 }
 

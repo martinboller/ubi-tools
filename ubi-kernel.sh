@@ -9,9 +9,20 @@ else
     exit 1;
 fi
 
+# Kernel module ubi
+sudo modprobe ubi;
+UBI_STATUS=$(lsmod | grep 'ubi')
+if [[ $UBI_STATUS ]]; then
+    echo -e "\e[32mKernel module \e[35mubi\e[32m successfully installed.\e[0m"
+else
+    echo -e "\e[31mKernel module \e[35mubi\e[31m could not be installed.\e[0m"
+    exit 1;
+fi
+
+
 # Kernel module ubifs
 sudo modprobe ubifs;
-UBI_STATUS=$(lsmod | grep -Ei 'ubi')
+UBI_STATUS=$(lsmod | grep 'ubifs')
 if [[ $UBI_STATUS ]]; then
     echo -e "\e[32mKernel module \e[35mubifs\e[32m successfully installed.\e[0m"
 else
