@@ -55,6 +55,7 @@ Once mounted, the extracted filesystem will be accessible at `/mnt/ubifs`. Copy 
 ```
 ## Raw UBIFS vs. Full UBI Image
 Both ubi-nandsim.sh and ubi-norsim.sh expect a full UBI image (containing UBI EC/VID headers, starting with UBI#). If you extracted a standalone UBIFS volume image (starting with magic 0x06101831, i.e., 31 18 10 06 in little-endian), ubiattach will fail unless it the MTD device isn't formatted (ubiformat /dev/mtd0), a volume created (ubimkvol), and the volume written with ubiupdatevol /dev/ubi0_0 image.ubifs. The scripts now handle that scenario as well.
+However, there are some potential edge-cases where the script may fail with standalone ubifs for nandsim: When ubiformat runs on nandsim with a standalone UBIFS image, ubiformat defaults to the NAND sub-page size reported by nandsim (e.g., 512 bytes on 2048-byte page NAND). If your standalone UBIFS image was built with mkfs.ubifs without sub-pages (where min_io_size equals the full page size, e.g., -m 2048), mount will complain about a min_io_size mismatch. If that happens on a specific target dump, add -s <page_size> (e.g., sudo ubiformat /dev/mtd0 -s 2048 -y and sudo ubiattach /dev/ubi_ctrl -m 0 -O 2048) to disable sub-page division.
 
 ## Disclaimer
 These scripts execute commands with `sudo` and write directly to `/dev/mtdblock0`. Ensure no physical MTD devices are currently attached to `/dev/mtdblock0` before running `ubi-nandsim.sh` or `ubi-norsim.sh` to avoid unintended data loss. (I have stories to tell).
