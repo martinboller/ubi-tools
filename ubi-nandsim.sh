@@ -25,37 +25,16 @@ check_status_install() {
 }
 
 ubi_kernel() {
-    # Kernel module mtdblock
-    sudo modprobe mtdblock;
-    MTD_STATUS=$(lsmod | grep -Ei 'mtd')
-    if [[ $MTD_STATUS ]]; then
-        echo -e "\e[32mKernel module \e[35mmtdblock\e[32m successfully installed.\e[0m"
-    else
-        echo -e "\e[31mKernel modules \e[35mmtdblock\e[31m could not be installed.\e[0m"
-        exit 1;
-    fi
-
-    # Kernel module ubi
-    sudo modprobe ubi;
-    UBI_STATUS=$(lsmod | grep 'ubi')
-    if [[ $UBI_STATUS ]]; then
-        echo -e "\e[32mKernel module \e[35mubi\e[32m successfully installed.\e[0m"
-    else
-        echo -e "\e[31mKernel module \e[35mubi\e[31m could not be installed.\e[0m"
-        exit 1;
-    fi
-
-    # Kernel module ubifs
-    sudo modprobe ubifs;
-    UBI_STATUS=$(lsmod | grep 'ubifs')
-    if [[ $UBI_STATUS ]]; then
-        echo -e "\e[32mKernel module \e[35mubifs\e[32m successfully installed.\e[0m"
-    else
-        echo -e "\e[31mKernel module \e[35mubifs\e[31m could not be installed.\e[0m"
-        exit 1;
-    fi
-
-    echo -e "\e[32mNecessary kernel modules successfully installed now running nandsim\e[0m"
+    for mod in mtdblock ubi ubifs; do
+        sudo modprobe "$mod"
+        if lsmod | grep -qw "$mod"; then
+            echo -e "\e[32mKernel module \e[35m$mod\e[32m successfully installed.\e[0m"
+        else
+            echo -e "\e[31mKernel module \e[35m$mod\e[31m could not be installed.\e[0m"
+            exit 1
+        fi
+    done
+    echo -e "\e[32mNecessary kernel modules successfully installed; configuring mtdram...\e[0m"
 }
 
 create_nandsim() {

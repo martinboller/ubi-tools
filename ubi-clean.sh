@@ -42,6 +42,10 @@ cleanup() {
     sudo modprobe -r mtd;
     check_status_install;
 
+    TOOL_INSTALL="remove mtdram kernel module";
+    sudo modprobe -r mtdram
+    check_status_install;
+
     # Double checking that everything is removed
     MODPROBE_STATUS=$(lsmod | grep -E "ubi|mtd|nand")
     if [[ $MODPROBE_STATUS ]]; then
